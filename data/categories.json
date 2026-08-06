@@ -1,0 +1,49 @@
+[
+  {
+    "name": "📚 ROADMAP",
+    "channels": ["roadmap", "checklist", "progresso"]
+  },
+  {
+    "name": "🌐 FUNDAMENTOS",
+    "channels": ["http", "https", "dns", "tls", "cookies", "jwt", "oauth", "cors", "csp"]
+  },
+  {
+    "name": "💻 DESENVOLVIMENTO",
+    "channels": ["javascript", "nodejs", "express", "react", "vue", "sql"]
+  },
+  {
+    "name": "🌍 INFRAESTRUTURA",
+    "channels": ["linux", "redes", "docker", "nginx", "apache"]
+  },
+  {
+    "name": "🔎 BUG BOUNTY",
+    "channels": ["recon", "burp-suite", "metodologia", "leitura-de-codigo"]
+  },
+  {
+    "name": "🐞 VULNERABILIDADES",
+    "channels": [
+      "idor",
+      "broken-access-control",
+      "xss",
+      "csrf",
+      "ssrf",
+      "sqli",
+      "xxe",
+      "ssti",
+      "request-smuggling",
+      "cache-poisoning",
+      "race-condition",
+      "business-logic",
+      "graphql",
+      "websocket"
+    ]
+  },
+  {
+    "name": "🧪 PRÁTICA",
+    "channels": ["portswigger", "writeups", "labs", "bugs-encontrados"]
+  },
+  {
+    "name": "📝 PESSOAL",
+    "channels": ["diario", "hipoteses", "erros", "ideias"]
+  }
+]
