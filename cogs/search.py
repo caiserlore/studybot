@@ -4,6 +4,7 @@ from discord.ext import commands
 from config import load_json
 from utils.embeds import create_embed
 from utils.logger import setup_logger
+from utils.pendo import track as pendo_track
 
 logger = setup_logger("Search")
 
@@ -35,6 +36,22 @@ class Search(commands.Cog):
 
         if not notes and not matching_templates:
             embed.description = "Nenhum resultado encontrado."
+
+        notes_count = len(notes) if notes else 0
+        templates_count = len(matching_templates) if matching_templates else 0
+        await pendo_track(
+            "search_executed",
+            visitor_id=str(interaction.user.id),
+            account_id=str(guild_id),
+            properties={
+                "search_term": termo[:100],
+                "notes_found_count": notes_count,
+                "templates_found_count": templates_count,
+                "total_results_count": notes_count + templates_count,
+                "has_results": bool(notes or matching_templates),
+                "guild_id": str(guild_id),
+            },
+        )
 
         await interaction.followup.send(embed=embed, ephemeral=True)
 
