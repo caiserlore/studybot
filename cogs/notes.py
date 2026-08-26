@@ -3,6 +3,7 @@ from discord import app_commands
 from discord.ext import commands
 from utils.embeds import create_embed
 from utils.logger import setup_logger
+from utils.pendo import track as pendo_track
 
 logger = setup_logger("Notes")
 
@@ -15,6 +16,16 @@ class Notes(commands.Cog):
     async def nota(self, interaction: discord.Interaction, conteudo: str):
         await interaction.response.defer(ephemeral=True)
         self.bot.db.add_note(interaction.guild.id, interaction.user.id, conteudo)
+        await pendo_track(
+            "note_saved",
+            visitor_id=str(interaction.user.id),
+            account_id=str(interaction.guild.id),
+            properties={
+                "guild_id": str(interaction.guild.id),
+                "user_id": str(interaction.user.id),
+                "content_length": len(conteudo),
+            },
+        )
         embed = create_embed("📌 Nota salva", "Sua nota foi armazenada com sucesso.", discord.Color.green())
         await interaction.followup.send(embed=embed, ephemeral=True)
 

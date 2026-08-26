@@ -4,6 +4,7 @@ from discord.ext import commands
 from config import load_json
 from utils.embeds import create_embed
 from utils.logger import setup_logger
+from utils.pendo import track as pendo_track
 
 logger = setup_logger("Search")
 
@@ -23,6 +24,21 @@ class Search(commands.Cog):
         matching_templates = {k: v for k, v in templates.items() if termo.lower() in k.lower() or termo.lower() in v.lower()}
 
         embed = discord.Embed(title=f"🔍 Resultados para: '{termo}'", color=discord.Color.blue())
+
+        await pendo_track(
+            "search_executed",
+            visitor_id=str(interaction.user.id),
+            account_id=str(interaction.guild.id),
+            properties={
+                "guild_id": str(interaction.guild.id),
+                "user_id": str(interaction.user.id),
+                "search_query": termo[:100],
+                "notes_results_count": len(notes),
+                "templates_results_count": len(matching_templates),
+                "has_results": bool(notes or matching_templates),
+            },
+        )
+
         if notes:
             text = ""
             for note in notes[:3]:
