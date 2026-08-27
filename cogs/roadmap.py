@@ -61,7 +61,7 @@ class Roadmap(commands.Cog):
                 properties={
                     "guild_id": str(interaction.guild.id),
                     "user_id": str(interaction.user.id),
-                    "total_topics_completed": len(completed),
+                    "total_topics_count": len(roadmap),
                 },
             )
             embed = create_embed("🎉 Parabéns!", "Você concluiu todos os tópicos do roadmap!", discord.Color.gold())
@@ -76,6 +76,11 @@ class Roadmap(commands.Cog):
             return await interaction.followup.send("Este canal não é um tópico do roadmap.", ephemeral=True)
         success = self.db.mark_completed(interaction.guild.id, interaction.user.id, channel_name)
         if success:
+            completed_topics = self.db.get_user_progress(interaction.guild.id, interaction.user.id)
+            completed_count = len(set(roadmap) & set(completed_topics))
+            total = len(roadmap)
+            percentage = round((completed_count / total) * 100, 1) if total > 0 else 0
+
             await pendo_track(
                 "topic_completed",
                 visitor_id=str(interaction.user.id),
@@ -83,7 +88,10 @@ class Roadmap(commands.Cog):
                 properties={
                     "guild_id": str(interaction.guild.id),
                     "user_id": str(interaction.user.id),
-                    "topic_name": channel_name,
+                    "topic": channel_name,
+                    "completed_topics_count": completed_count,
+                    "total_topics_count": total,
+                    "completion_percentage": percentage,
                 },
             )
             embed = create_embed("✅ Tópico concluído", f"**{channel_name}** marcado como concluído.", discord.Color.green())
@@ -99,6 +107,10 @@ class Roadmap(commands.Cog):
         if channel_name not in roadmap:
             return await interaction.followup.send("Este canal não é um tópico do roadmap.", ephemeral=True)
         self.db.unmark_completed(interaction.guild.id, interaction.user.id, channel_name)
+
+        completed_topics = self.db.get_user_progress(interaction.guild.id, interaction.user.id)
+        remaining = len(set(roadmap) & set(completed_topics))
+
         await pendo_track(
             "topic_reopened",
             visitor_id=str(interaction.user.id),
@@ -106,7 +118,9 @@ class Roadmap(commands.Cog):
             properties={
                 "guild_id": str(interaction.guild.id),
                 "user_id": str(interaction.user.id),
-                "topic_name": channel_name,
+                "topic": channel_name,
+                "remaining_completed_count": remaining,
+                "total_topics_count": len(roadmap),
             },
         )
         embed = create_embed("🔓 Tópico reaberto", f"**{channel_name}** foi reaberto.", discord.Color.blue())

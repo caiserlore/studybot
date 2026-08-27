@@ -24,6 +24,7 @@ class Notes(commands.Cog):
                 "guild_id": str(interaction.guild.id),
                 "user_id": str(interaction.user.id),
                 "content_length": len(conteudo),
+                "channel_name": interaction.channel.name,
             },
         )
         embed = create_embed("📌 Nota salva", "Sua nota foi armazenada com sucesso.", discord.Color.green())

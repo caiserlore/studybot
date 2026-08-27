@@ -23,7 +23,8 @@ class Search(commands.Cog):
         templates = load_json("templates.json")
         matching_templates = {k: v for k, v in templates.items() if termo.lower() in k.lower() or termo.lower() in v.lower()}
 
-        embed = discord.Embed(title=f"🔍 Resultados para: '{termo}'", color=discord.Color.blue())
+        notes_count = len(notes) if notes else 0
+        templates_count = len(matching_templates) if matching_templates else 0
 
         await pendo_track(
             "search_executed",
@@ -32,12 +33,15 @@ class Search(commands.Cog):
             properties={
                 "guild_id": str(interaction.guild.id),
                 "user_id": str(interaction.user.id),
-                "search_query": termo[:100],
-                "notes_results_count": len(notes),
-                "templates_results_count": len(matching_templates),
+                "search_term": termo[:100],
+                "notes_result_count": notes_count,
+                "templates_result_count": templates_count,
+                "total_result_count": notes_count + templates_count,
                 "has_results": bool(notes or matching_templates),
             },
         )
+
+        embed = discord.Embed(title=f"🔍 Resultados para: '{termo}'", color=discord.Color.blue())
 
         if notes:
             text = ""

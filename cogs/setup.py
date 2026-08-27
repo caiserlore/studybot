@@ -79,6 +79,8 @@ class Setup(commands.Cog):
                 "skipped_categories": skipped_categories,
                 "created_channels": created_channels,
                 "skipped_channels": skipped_channels,
+                "total_categories_in_config": len(categories_data),
+                "total_channels_in_config": sum(len(cat["channels"]) for cat in categories_data),
             },
         )
 

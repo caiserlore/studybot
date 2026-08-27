@@ -1,3 +1,4 @@
+import os
 import time
 
 import aiohttp
@@ -6,13 +7,19 @@ from utils.logger import setup_logger
 
 logger = setup_logger("Pendo")
 
+# TODO: Set PENDO_TRACK_EVENT_SECRET environment variable with your Pendo
+# integration key. This is required for server-side track events to reach Pendo.
 PENDO_TRACK_URL = "https://data.pendo.io/data/track"
-PENDO_INTEGRATION_KEY = "26f7185f-41a8-44bd-9a73-90a885e28aca"
 
 
 async def track(
     event: str, visitor_id: str, account_id: str, properties: dict | None = None
 ):
+    integration_key = os.getenv("PENDO_TRACK_EVENT_SECRET")
+    if not integration_key:
+        logger.warning("PENDO_TRACK_EVENT_SECRET not set; skipping track event: %s", event)
+        return
+
     payload = {
         "type": "track",
         "event": event,
@@ -31,7 +38,7 @@ async def track(
                 json=payload,
                 headers={
                     "Content-Type": "application/json",
-                    "x-pendo-integration-key": PENDO_INTEGRATION_KEY,
+                    "x-pendo-integration-key": integration_key,
                 },
             ) as resp,
         ):
