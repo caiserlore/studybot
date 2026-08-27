@@ -5,6 +5,7 @@ from config import load_json
 from utils.helpers import send_and_pin
 from utils.permissions import is_admin
 from utils.logger import setup_logger
+from utils.pendo import track as pendo_track
 
 logger = setup_logger("Setup")
 
@@ -67,6 +68,21 @@ class Setup(commands.Cog):
         embed.add_field(name="Categorias já existentes", value=str(skipped_categories), inline=True)
         embed.add_field(name="Canais criados", value=str(created_channels), inline=True)
         embed.add_field(name="Canais já existentes", value=str(skipped_channels), inline=True)
+
+        await pendo_track(
+            "server_setup_completed",
+            visitor_id=str(interaction.user.id),
+            account_id=str(interaction.guild.id),
+            properties={
+                "guild_id": str(interaction.guild.id),
+                "created_categories": created_categories,
+                "skipped_categories": skipped_categories,
+                "created_channels": created_channels,
+                "skipped_channels": skipped_channels,
+                "total_categories_in_config": len(categories_data),
+                "total_channels_in_config": sum(len(cat["channels"]) for cat in categories_data),
+            },
+        )
 
         await interaction.followup.send(embed=embed, ephemeral=True)
 

@@ -5,6 +5,7 @@ from config import load_json
 from utils.helpers import send_and_pin
 from utils.permissions import is_admin
 from utils.logger import setup_logger
+from utils.pendo import track as pendo_track
 
 logger = setup_logger("Templates")
 
@@ -37,6 +38,17 @@ class Templates(commands.Cog):
         templates = load_json("templates.json")
         content = templates.get(template or nome) or templates.get(nome) or load_json("config.json").get("default_template", "## Tópico")
         msg = await send_and_pin(channel, content)
+        await pendo_track(
+            "topic_channel_created",
+            visitor_id=str(interaction.user.id),
+            account_id=str(interaction.guild.id),
+            properties={
+                "guild_id": str(interaction.guild.id),
+                "channel_name": nome,
+                "category_name": categoria.name,
+                "template_used": template or nome,
+            },
+        )
         embed = discord.Embed(
             title="✅ Canal criado",
             description=f"Canal {channel.mention} criado em **{categoria.name}** com o template selecionado.",
@@ -57,6 +69,18 @@ class Templates(commands.Cog):
             (guild_id, user_id, thread.id, number)
         )
         self.bot.db.conn.commit()
+        await pendo_track(
+            "hypothesis_created",
+            visitor_id=str(user_id),
+            account_id=str(guild_id),
+            properties={
+                "guild_id": str(guild_id),
+                "user_id": str(user_id),
+                "hypothesis_number": number,
+                "channel_name": interaction.channel.name,
+                "thread_id": str(thread.id),
+            },
+        )
         await thread.send("## Hipótese\n\nDescreva aqui sua hipótese e os testes planejados.")
         embed = discord.Embed(
             title="💡 Hipótese criada",
@@ -78,6 +102,18 @@ class Templates(commands.Cog):
             (guild_id, user_id, thread.id, number)
         )
         self.bot.db.conn.commit()
+        await pendo_track(
+            "lab_created",
+            visitor_id=str(user_id),
+            account_id=str(guild_id),
+            properties={
+                "guild_id": str(guild_id),
+                "user_id": str(user_id),
+                "lab_number": number,
+                "channel_name": interaction.channel.name,
+                "thread_id": str(thread.id),
+            },
+        )
         template = (
             "## Objetivo\n\n"
             "## Aplicação\n\n"
@@ -107,6 +143,18 @@ class Templates(commands.Cog):
             (guild_id, user_id, thread.id, number)
         )
         self.bot.db.conn.commit()
+        await pendo_track(
+            "writeup_created",
+            visitor_id=str(user_id),
+            account_id=str(guild_id),
+            properties={
+                "guild_id": str(guild_id),
+                "user_id": str(user_id),
+                "writeup_number": number,
+                "channel_name": interaction.channel.name,
+                "thread_id": str(thread.id),
+            },
+        )
         template = (
             "## Empresa\n\n"
             "## Programa\n\n"
